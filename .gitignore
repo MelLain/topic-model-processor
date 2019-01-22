@@ -3,6 +3,9 @@
 
 # python files
 *.pyc
+*.egg-info*
+*/dist*
+*dist/*
 
 *.log.INFO.*
 *.log.WARNING.*
