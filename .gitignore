@@ -1,0 +1,29 @@
+# generated .batch files
+*.batch
+
+# python files
+*.pyc
+
+*.log.INFO.*
+*.log.WARNING.*
+*.log.ERROR.*
+*.batch
+
+*\#*\#*
+*~
+
+build*
+
+/src/python/.idea/*
+
+# pytest temp files
+/python/build/*
+/python/.cache/*
+
+# MAC OS temp files
+*.DS_Store
+
+# bigartm logs
+*bigartm.ERROR
+*bigartm.INFO
+*bigartm.WARNING
