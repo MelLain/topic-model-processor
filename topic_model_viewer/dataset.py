@@ -1,4 +1,7 @@
-# Topic Model Processor (2019)
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Topic Model Viewer (2019)
 
 class Dataset(object):
     def __init__(self, dataset_path):

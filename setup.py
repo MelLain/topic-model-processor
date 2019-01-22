@@ -1,4 +1,4 @@
-# Topic Model Processor (2019)
+# Topic Model Viewer (2019)
 
 from __future__ import print_function
 
@@ -82,12 +82,12 @@ class build(_build):
         generate_proto_files(
             '.',
             "./messages.proto",
-            "./topic_model_processor/messages_pb2.py")
+            "./topic_model_viewer/messages_pb2.py")
 
         _build.run(self)
 
 setup_kwargs = dict(
-    name='topic_model_processor',
+    name='topic_model_viewer',
     version='0.0.1',
     packages=find_packages(),
     install_requires=[

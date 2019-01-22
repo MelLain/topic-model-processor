@@ -1,4 +1,4 @@
-# Topic Model Processor (2019)
+# Topic Model Viewer (2019)
 
 class Storage(object):
     def __init__(self):
