@@ -1,3 +1,5 @@
+# Topic Model Processor (2019)
+
 from setuptools import setup, find_packages
 
 setup_kwargs = dict(

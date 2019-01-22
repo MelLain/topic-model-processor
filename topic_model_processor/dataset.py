@@ -1,3 +1,5 @@
+# Topic Model Processor (2019)
+
 class Dataset(object):
     def __init__(self, dataset_path):
         self.__dataset_path = dataset_path

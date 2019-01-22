@@ -1,4 +1,6 @@
-class GlobalStorage(object):
+# Topic Model Processor (2019)
+
+class Storage(object):
     def __init__(self):
         self.__models = {}
         self.__hierarchical_relations = {}
