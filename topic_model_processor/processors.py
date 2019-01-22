@@ -1,4 +1,4 @@
-__storage = {}
+__storage = TopicModelStorage()
 def get_model_storage():
     global __storage
     return __storage

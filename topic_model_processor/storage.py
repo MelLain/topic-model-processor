@@ -1,6 +1,7 @@
-class TopicModelStorage(object):
+class GlobalStorage(object):
     def __init__(self):
         self.__models = {}
+        self.__hierarchical_relations = {}
         self.__datasets = {}
 
     def add_model(self, name, model):
@@ -12,6 +13,12 @@ class TopicModelStorage(object):
         if name in self.__models:
             raise Exception('Model {} doesn\'t present in the models list'.format(name))
         del self.__models[name]
+
+    def add_hierarchical_relation(self):
+        pass
+
+    def remove__hierarchical_relation(self):
+        pass
 
     def add_dataset(self, name, dataset):
         if name in self.__datasets:
