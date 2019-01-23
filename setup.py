@@ -15,10 +15,10 @@ from distutils.command.build import build as _build
 
 def find_protoc_exec():
     # extract path to protobuf executable from command-line arguments
-    argument_prefix = "protoc_executable"
+    argument_prefix = 'protoc_executable'
 
-    parser = argparse.ArgumentParser(description="", add_help=False)
-    parser.add_argument("--{}".format(argument_prefix), action="store")
+    parser = argparse.ArgumentParser(description='', add_help=False)
+    parser.add_argument('--{}'.format(argument_prefix), action='store')
     found_args, rest_args = parser.parse_known_args(sys.argv)
     sys.argv = rest_args
 
@@ -31,7 +31,7 @@ def find_protoc_exec():
         return os.environ['PROTOC']
 
     # try to find using distutils helper function
-    return find_executable("protoc")
+    return find_executable('protoc')
 
 protoc_exec = find_protoc_exec()
 
@@ -39,9 +39,9 @@ def generate_proto_files(
         src_folder,
         src_proto_file,
         dst_py_file):
-    """
+    '''
     Generates pb2.py files from corresponding .proto files
-    """
+    '''
 
     source_file = os.path.join(src_folder, src_proto_file)
     output_file = dst_py_file
@@ -49,27 +49,27 @@ def generate_proto_files(
     if (not os.path.exists(output_file) or
             os.path.exists(output_file) and
             os.path.getmtime(source_file) > os.path.getmtime(output_file)):
-        print("Generating {}...".format(dst_py_file))
+        print('Generating {}...'.format(dst_py_file))
 
         if not os.path.exists(source_file):
-            sys.stderr.write("Can't find required file: {}\n".format(
+            sys.stderr.write('Can\'t find required file: {}\n'.format(
                 source_file))
             sys.exit(-1)
 
         if not protoc_exec:
-            raise ValueError("No protobuf compiler executable was found!")
+            raise ValueError('No protobuf compiler executable was found!')
 
         try:
-            tmp_dir = tempfile.mkdtemp(dir="./")
+            tmp_dir = tempfile.mkdtemp(dir='./')
             protoc_command = [
                 protoc_exec,
-                "-I" + src_folder,
-                "--python_out=" + tmp_dir,
+                '-I' + src_folder,
+                '--python_out=' + tmp_dir,
                 source_file]
-            print("Executing {}...".format(protoc_command))
+            print('Executing {}...'.format(protoc_command))
             if subprocess.call(protoc_command):
                 raise
-            src_py_file = src_proto_file.replace(".proto", "_pb2.py")
+            src_py_file = src_proto_file.replace('.proto', '_pb2.py')
             if os.path.exists(dst_py_file):
                 os.remove(dst_py_file)
             os.rename(os.path.join(tmp_dir, src_py_file), dst_py_file)
@@ -80,9 +80,9 @@ def generate_proto_files(
 class build(_build):
     def run(self):
         generate_proto_files(
-            '.',
-            "./messages.proto",
-            "./topic_model_viewer/messages_pb2.py")
+            './topic_model_viewer',
+            'messages.proto',
+            './topic_model_viewer/messages_pb2.py')
 
         _build.run(self)
 
