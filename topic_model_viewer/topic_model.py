@@ -3,89 +3,40 @@
 
 # Topic Model Viewer (2019)
 
-import os
-import json
-import codecs
+from . import artm_dump_parser
 
-from . import messages_pb2 as messages
-from . import constants
-
+# This class should contain all common routines of model processing, that do not need result caching
 class TopicModel(object):
-    # here different init methods can be added, like set of DataFrames or so on
-
-    def __init__(self, model_path):
+    # read model either from dump or directly from DataFrames and meta-data in dicts
+    def __init__(self, model_path=None, phi=None, nwt=None, theta=None, parameters=None, score_tracker=None):
         self.__model_path = model_path
+        
+        dump_parser = artm_dump_parser.ArtmDumpParser(model_path) if model_path is not None else None
 
-        # here protobuf messages should be put into DF
-        self.__pwt = self.__read_model_file(os.path.join(model_path, 'p_wt.bin'))
-        self.__nwt = self.__read_model_file(os.path.join(model_path, 'n_wt.bin'))
+        if dump_parser is not None:
+            self.__phi = dump_parser.get_phi_as_df()
+            self.__nwt = dump_parser.get_nwt_as_df()
 
-        theta_file_path = os.path.join(model_path, 'theta.bin')
-        self.__theta = None
-        if os.path.exists(theta_file_path):
-            self.__theta = self.__read_model_file(theta_file_path)
+            self.__theta = dump_parser.get_theta_as_df()
 
-        # wrap this fields content with getters (like get_topic_name, get_tokens etc)
-        self.__parameters = self.__read_parameters(model_path)
-        self.__score_tracker = self.__read_score_tracker(model_path)
-        print(self.__score_tracker)
+            self.__score_tracker = dump_parser.get_score_tracker()
+            self.__parameters = dump_parser.get_parameters()
+        elif phi is not None: # maybe here should be more strict constrains?
+            self.__phi = phi
+            self.__nwt = nwt
 
-    # this function is invalid for large models with 2 or more slices, shoulb upgraded with DF usage
-    def __read_model_file(self, filename):
-        with open(filename) as fin:
-            fin.readline()
-            model = messages.TopicModel()
-            model.ParseFromString('\n' + fin.read())
-        return model
+            self.__theta = theta
 
-    def __read_parameters(self, model_path):
-        with codecs.open(os.path.join(model_path, 'parameters.json')) as fin:
-            return json.load(fin)
+            self.__score_tracker = score_tracker
+            self.__parameters = parameters
+        else:
+            raise Exception('Unable to create TopicModel instance without phi matrix')
 
-    # this method is incorrect for now
-    def __read_score_tracker(self, model_path):
-        score_tracker = {}
-        with open(os.path.join(model_path, 'score_tracker.bin')) as fin:
-            for i, line in enumerate(fin):
-                if i % 2 == 0:
-                    continue
+    # here should be getters for all field and their contents
 
-                score_data = messages.ScoreData()
-                score_data.ParseFromString('\n' + line)
-                score_tracker[score_data.name] = self.__parse_score_data(score_data)
+    # simple examples
+    def get_topic_names(self):
+        return list(self.__phi.columns.values)
 
-        return score_tracker
-
-    def __parse_score_data(self, score_data):
-        message = None
-        if score_data.type == constants.ScoreType_Perplexity:
-            message = messages.PerplexityScore()
-
-        elif score_data.type == constants.ScoreType_SparsityTheta:
-            message = messages.SparsityThetaScore()
-
-        elif score_data.type == constants.ScoreType_SparsityPhi:
-            message = messages.SparsityPhiScore()
-
-        elif score_data.type == constants.ScoreType_ItemsProcessed:
-            message = messages.ItemsProcessedScore()
-
-        elif score_data.type == constants.ScoreType_TopTokens:
-            message = messages.TopTokensScore()
-
-        elif score_data.type == constants.ScoreType_ThetaSnippet:
-            message = messages.ThetaSnippetScore()
-
-        elif score_data.type == constants.ScoreType_TopicKernel:
-            message = messages.TopicKernelScore()
-
-        elif score_data.type == constants.ScoreType_TopicMassPhi:
-            message = messages.TopicMassPhiScore()
-
-        elif score_data.type == constants.ScoreType_ClassPrecision:
-            message = messages.ClassPrecisionScore()
-
-        elif score_data.type == constants.ScoreType_BackgroundTokensRatio:
-            message = messages.BackgroundTokensRatioScore()
-
-        return message
+    def get_tokens(self):
+        return list(self.__phi.index.values)
